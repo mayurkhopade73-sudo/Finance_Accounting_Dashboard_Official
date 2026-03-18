@@ -167,7 +167,7 @@ export default function AssetManagementPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table> 
         </div>
       )}
 
