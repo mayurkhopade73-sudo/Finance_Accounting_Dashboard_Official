@@ -11,7 +11,7 @@ export default function SLAPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">SLA Management</h1>
+        <h1 className="text-2xl font-bold text-white-800">SLA Management</h1>
         <p className="text-gray-500 text-sm mt-1">Service Level Agreement policies and compliance tracking</p>
       </div>
       <div className="grid grid-cols-3 gap-4">

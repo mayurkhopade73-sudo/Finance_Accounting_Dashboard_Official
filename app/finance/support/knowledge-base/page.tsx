@@ -41,7 +41,7 @@ export default function KnowledgeBasePage() {
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-gray-800">Knowledge Base</h1><p className="text-gray-500 text-sm mt-1">Finance help articles and guides</p></div>
+        <div><h1 className="text-2xl font-bold text-white-800">Knowledge Base</h1><p className="text-gray-500 text-sm mt-1">Finance help articles and guides</p></div>
         <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus className="w-4 h-4" /> New Article</button>
       </div>
 

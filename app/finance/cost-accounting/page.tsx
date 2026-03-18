@@ -53,7 +53,7 @@ export default function CostAccountingPage() {
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Cost Accounting</h1>
+          <h1 className="text-2xl font-bold text-white-800">Cost Accounting</h1>
           <p className="text-gray-500 text-sm mt-1">Cost centers, job costing, ABC & profitability</p>
         </div>
         <button onClick={() => setToast('Cost center added!')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">

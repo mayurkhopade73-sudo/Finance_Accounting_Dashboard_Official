@@ -46,7 +46,7 @@ export default function AccountsPayablePage() {
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-gray-800">Accounts Payable</h1><p className="text-gray-500 text-sm mt-1">Manage vendor bills and outgoing payments</p></div>
+        <div><h1 className="text-2xl font-bold text-white-800">Accounts Payable</h1><p className="text-gray-500 text-sm mt-1">Manage vendor bills and outgoing payments</p></div>
         <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus className="w-4 h-4" /> Record Bill</button>
       </div>
 

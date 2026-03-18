@@ -18,7 +18,7 @@ export default function FinanceAnalyticsPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Financial Analytics</h1>
+        <h1 className="text-2xl font-bold text-white-800">Financial Analytics</h1>
         <p className="text-gray-500 text-sm mt-1">AI-powered financial insights & forecasting</p>
       </div>
 

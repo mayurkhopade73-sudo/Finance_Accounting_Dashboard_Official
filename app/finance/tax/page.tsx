@@ -40,7 +40,7 @@ export default function TaxPage() {
   return (
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
-      <div><h1 className="text-2xl font-bold text-gray-800">Tax Management</h1><p className="text-gray-500 text-sm mt-1">GST, TDS, income tax filings and compliance</p></div>
+      <div><h1 className="text-2xl font-bold text-white-800">Tax Management</h1><p className="text-gray-500 text-sm mt-1">GST, TDS, income tax filings and compliance</p></div>
       <div className="grid grid-cols-3 gap-4">
         {[{label:'Total Filed',value:`$${totalPaid.toLocaleString()}`,color:'text-emerald-400'},{label:'Pending',value:`$${totalPending.toLocaleString()}`,color:'text-amber-400'},{label:'Compliance Rate',value:'100%',color:'text-blue-400'}].map(s=>
           <div key={s.label} className="bg-gray-900 rounded-xl p-5"><div className="text-gray-400 text-sm mb-2">{s.label}</div><div className={`text-2xl font-bold ${s.color}`}>{s.value}</div></div>

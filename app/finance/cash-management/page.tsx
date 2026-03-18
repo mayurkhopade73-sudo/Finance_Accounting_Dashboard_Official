@@ -51,7 +51,7 @@ export default function CashManagementPage() {
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Cash Management</h1>
+          <h1 className="text-2xl font-bold text-white-800">Cash Management</h1>
           <p className="text-gray-500 text-sm mt-1">Bank accounts, cash flow & treasury operations</p>
         </div>
         <button onClick={() => setToast('Account form — contact your bank admin')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">

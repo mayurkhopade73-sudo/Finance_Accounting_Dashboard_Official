@@ -1,16 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
-
+ 
 html,
 body {
   max-width: 100vw;
   background-color: #111827;
   color: white;
+} */
+
+body {
+  max-width: 100vw;
+  background: var(--bg);
+  color: var(--text-primary);
 }
+
+/* GPT */
+:root {
+  /* LIGHT MODE */
+  --bg: #F9FAFB;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
+
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+
+  --primary: #4F46E5;
+  --accent: #16A34A;
+  --danger: #DC2626;
+}
+
+.dark {
+  /* DARK MODE */
+  --bg: #0B1120;
+  --card: #111827;
+  --border: #1F2937;
+
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
+
+  --primary: #6366F1;
+  --accent: #22C55E;
+  --danger: #EF4444;
+}
+
