@@ -44,7 +44,7 @@ export default function GeneralLedgerPage() {
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold text-gray-800">General Ledger</h1><p className="text-gray-500 text-sm mt-1">All journal entries and account balances</p></div>
+        <div><h1 className="text-2xl font-bold text-white-800">General Ledger</h1><p className="text-gray-500 text-sm mt-1">All journal entries and account balances</p></div>
         <div className="flex gap-2">
           <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50"><Download className="w-4 h-4" /> Export</button>
           <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"><Plus className="w-4 h-4" /> Journal Entry</button>

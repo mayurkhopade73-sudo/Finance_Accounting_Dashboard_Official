@@ -39,7 +39,7 @@ export default function ReportsPage() {
   return (
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
-      <div><h1 className="text-2xl font-bold text-gray-800">Financial Reports</h1><p className="text-gray-500 text-sm mt-1">Generate and download financial reports</p></div>
+      <div><h1 className="text-2xl font-bold text-white-800">Financial Reports</h1><p className="text-gray-500 text-sm mt-1">Generate and download financial reports</p></div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {reports.map(r => (

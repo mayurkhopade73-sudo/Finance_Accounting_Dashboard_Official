@@ -46,7 +46,7 @@ export default function IntegrationsPage() {
   return (
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
-      <div><h1 className="text-2xl font-bold text-gray-800">Integrations</h1><p className="text-gray-500 text-sm mt-1">Connect your finance stack with third-party tools</p></div>
+      <div><h1 className="text-2xl font-bold text-white-800">Integrations</h1><p className="text-gray-500 text-sm mt-1">Connect your finance stack with third-party tools</p></div>
 
       <div className="grid grid-cols-3 gap-4">
         {[{label:'Connected',value:connected.length},{label:'Available',value:available.length},{label:'Webhooks',value:webhooks.length}].map(s=>

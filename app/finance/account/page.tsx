@@ -109,7 +109,7 @@ export default function AccountPage() {
 
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
 
-      <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+      <h1 className="text-xl md:text-2xl font-bold text-white-800">
         My Account
       </h1>
 

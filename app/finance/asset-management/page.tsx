@@ -55,7 +55,7 @@ export default function AssetManagementPage() {
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Asset Management</h1>
+          <h1 className="text-2xl font-bold text-white-800">Asset Management</h1>
           <p className="text-gray-500 text-sm mt-1">Track, manage, and depreciate company assets</p>
         </div>
         <button onClick={() => setToast('Add Asset form initiated')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">

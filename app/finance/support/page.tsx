@@ -21,7 +21,7 @@ export default function SupportHomePage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Support Home</h1>
+        <h1 className="text-2xl font-bold text-white-800">Support Home</h1>
         <p className="text-gray-500 text-sm mt-1">Customer support operations dashboard</p>
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">

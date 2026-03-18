@@ -40,7 +40,7 @@ export default function SettingsPage() {
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast("")} />}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
+        <h1 className="text-2xl font-bold text-white-800">Settings</h1>
         <p className="text-gray-500 text-sm mt-1">Manage platform configuration and preferences</p>
       </div>
 

@@ -20,36 +20,15 @@ const sections: NavSection[] = [
       { label: 'Dashboard', href: '/finance', icon: LayoutDashboard },
       { label: 'Accounts', href: '/finance/account', icon: UserCircle },
       { label: 'Customers', href: '/finance/customer', icon: Users },
-      { label: 'Contacts', href: '/finance/contacts', icon: BookOpen },
-      { label: 'Leads', href: '/finance/leads', icon: Target },
-      { label: 'Opportunities', href: '/finance/opportunities', icon: Briefcase },
     ],
   },
-  {
-    title: 'Sales',
-    items: [
-      { label: 'Quotes', href: '/finance/quotes', icon: FileText },
-      { label: 'Orders', href: '/finance/orders', icon: ShoppingCart },
-    ],
-  },
+
   {
     title: 'Basic Features',
     badge: 'BASIC',
     items: [
       { label: 'ROI', href: '/finance/roi', icon: TrendingUp },
       { label: 'Content', href: '/finance/content', icon: BookMarked },
-    ],
-  },
-  {
-    title: 'Support',
-    items: [
-      { label: 'Support Home', href: '/finance/support', icon: Headphones },
-      { label: 'Tickets', href: '/finance/support/tickets', icon: Ticket },
-      { label: 'Live Chat', href: '/finance/support/live-chat', icon: MessageSquare },
-      { label: 'Knowledge Base', href: '/finance/support/knowledge-base', icon: BookOpenCheck },
-      { label: 'SLA', href: '/finance/support/sla', icon: SlidersHorizontal },
-      { label: 'Support Analytics', href: '/finance/support/analysis', icon: BarChart },
-      { label: 'Products', href: '/finance/products', icon: Package },
     ],
   },
   {
@@ -70,6 +49,19 @@ const sections: NavSection[] = [
       { label: 'Integrations', href: '/finance/integrations', icon: Link2 },
     ],
   },
+  {
+    title: 'Support',
+    items: [
+      { label: 'Support Home', href: '/finance/support', icon: Headphones },
+      { label: 'Tickets', href: '/finance/support/tickets', icon: Ticket },
+      { label: 'Live Chat', href: '/finance/support/live-chat', icon: MessageSquare },
+      { label: 'Knowledge Base', href: '/finance/support/knowledge-base', icon: BookOpenCheck },
+      { label: 'SLA', href: '/finance/support/sla', icon: SlidersHorizontal },
+      { label: 'Support Analytics', href: '/finance/support/analysis', icon: BarChart },
+      { label: 'Products', href: '/finance/products', icon: Package },
+    ],
+  },
+
 ];
 
 const settingsItem: NavItem = { label: 'Settings', href: '/finance/settings', icon: Settings };
@@ -90,8 +82,8 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [search, setSearch] = useState('');
 
-  const isActive = (href: string) =>
-    pathname === href || (href !== '/finance' && pathname.startsWith(href + '/'));
+  const isActive = (href: string) => pathname === href;
+  // pathname === href || (href !== '/finance' && pathname.startsWith(href + '/'));
 
   const allItems = sections.flatMap(s => s.items).concat([settingsItem]);
   const filtered = search ? allItems.filter(i => i.label.toLowerCase().includes(search.toLowerCase())) : null;

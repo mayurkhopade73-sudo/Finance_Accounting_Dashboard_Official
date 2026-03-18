@@ -87,7 +87,7 @@ export default function LiveChatPage() {
   return (
     <div className="p-6 h-[calc(100vh-80px)] flex flex-col">
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Live Chat</h1>
+        <h1 className="text-2xl font-bold text-white-800">Live Chat</h1>
         <p className="text-gray-500 text-sm mt-1">
           Real-time customer support conversations
         </p>
