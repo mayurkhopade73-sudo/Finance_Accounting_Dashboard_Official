@@ -161,7 +161,8 @@ export default function CostAccountingPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Cost Accounting</h1>
+        
+          <h1 className="text-2xl font-bold text-white-800">Cost Accounting</h1>
           <p className="text-gray-500 text-sm mt-1">Cost centers, job costing, ABC & profitability</p>
         </div>
         <button
