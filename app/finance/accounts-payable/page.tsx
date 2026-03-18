@@ -63,7 +63,7 @@ export default function AccountsPayablePage() {
 
       <div className="bg-gray-900 rounded-xl overflow-hidden">
         <table className="w-full">
-          <thead><tr className="bg-gray-800 border-b border-gray-700">{['Invoice','Vendor','Amount','Due Date','Category','Status','Action'].map(h=><th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+          <thead><tr className="bg-gray-800 border-b border-gray-700">{['Invoice', 'Vendor', 'Amount', 'Due Date', 'Category', 'Status', 'Action'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
           <tbody className="divide-y divide-gray-800">
             {bills.map(b => (
               <tr key={b.invoice} className="hover:bg-gray-800/60">
@@ -89,10 +89,10 @@ export default function AccountsPayablePage() {
       {/* Record Bill Modal */}
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Record New Bill">
         <div className="space-y-4">
-          <FormField label="Vendor Name"><input className={inputCls} placeholder="e.g. SupplierCo Ltd" value={form.vendor} onChange={e=>setForm(f=>({...f,vendor:e.target.value}))} /></FormField>
-          <FormField label="Amount ($)"><input type="number" className={inputCls} placeholder="e.g. 4200" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))} /></FormField>
-          <FormField label="Due Date"><input type="date" className={inputCls} value={form.due} onChange={e=>setForm(f=>({...f,due:e.target.value}))} /></FormField>
-          <FormField label="Category"><select className={selectCls} value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}><option>Technology</option><option>Raw Materials</option><option>Office Supplies</option><option>Logistics</option><option>Marketing</option></select></FormField>
+          <FormField label="Vendor Name"><input className={inputCls} placeholder="e.g. SupplierCo Ltd" value={form.vendor} onChange={e => setForm(f => ({ ...f, vendor: e.target.value }))} /></FormField>
+          <FormField label="Amount ($)"><input type="number" className={inputCls} placeholder="e.g. 4200" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} /></FormField>
+          <FormField label="Due Date"><input type="date" className={inputCls} value={form.due} onChange={e => setForm(f => ({ ...f, due: e.target.value }))} /></FormField>
+          <FormField label="Category"><select className={selectCls} value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}><option>Technology</option><option>Raw Materials</option><option>Office Supplies</option><option>Logistics</option><option>Marketing</option></select></FormField>
           <div className="flex gap-3 pt-2">
             <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
             <button onClick={handleCreate} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Record Bill</button>
