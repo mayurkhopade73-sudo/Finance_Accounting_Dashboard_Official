@@ -24,15 +24,22 @@ export default function TicketsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [viewTicket, setViewTicket] = useState<typeof initTickets[0]|null>(null);
   const [toast, setToast] = useState('');
-  const [form, setForm] = useState({ subject: '', client: '', priority: 'Medium', assignee: 'Support Team' });
+  const [form, setForm] = useState({ subject: '', client: '', priority: 'Low', assignee: '', description: '', attachment: null as File | null });
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   const handleCreate = () => {
-    if (!form.subject || !form.client) return;
-    setTickets(prev => [{ id: `TKT-00${prev.length+1}`, ...form, status: 'Open', created: 'Mar 13, 2026' }, ...prev]);
-    setForm({ subject: '', client: '', priority: 'Medium', assignee: 'Support Team' });
-    setShowCreate(false);
-    setToast('Ticket created!');
-  };
+  const newErrors: Record<string, boolean> = {};
+  if (!form.subject) newErrors.subject = true;
+  if (!form.client) newErrors.client = true;
+  if (!form.assignee) newErrors.assignee = true;
+  if (!form.description) newErrors.description = true;
+  if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+  setTickets(prev => [{ id: `TKT-00${prev.length+1}`, subject: form.subject, client: form.client, priority: form.priority, assignee: form.assignee, status: 'Open', created: 'Mar 13, 2026' }, ...prev]);
+  setForm({ subject: '', client: '', priority: 'Low', assignee: '', description: '', attachment: null });
+  setErrors({});
+  setShowCreate(false);
+  setToast('Ticket created!');
+};
 
   const handleResolve = (id: string) => {
     setTickets(prev => prev.map(t => t.id === id ? { ...t, status: 'Resolved' } : t));
@@ -71,20 +78,86 @@ export default function TicketsPage() {
           </tbody>
         </table>
       </div>
-      <Modal open={showCreate} onClose={()=>setShowCreate(false)} title="New Support Ticket">
-        <div className="space-y-4">
-          <FormField label="Subject"><input className={inputCls} value={form.subject} onChange={e=>setForm(f=>({...f,subject:e.target.value}))} placeholder="Describe the issue" /></FormField>
-          <FormField label="Client"><input className={inputCls} value={form.client} onChange={e=>setForm(f=>({...f,client:e.target.value}))} placeholder="Client name" /></FormField>
-          <div className="grid grid-cols-2 gap-3">
-            <FormField label="Priority"><select className={selectCls} value={form.priority} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></FormField>
-            <FormField label="Assignee"><select className={selectCls} value={form.assignee} onChange={e=>setForm(f=>({...f,assignee:e.target.value}))}><option>Support Team</option><option>Finance Manager</option><option>Super Admin</option></select></FormField>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button onClick={()=>setShowCreate(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
-            <button onClick={handleCreate} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Create Ticket</button>
-          </div>
+      <Modal open={showCreate} onClose={()=>{ setShowCreate(false); setErrors({}); }} title="New Ticket">
+  <div className="space-y-4">
+
+    {/* Subject */}
+    <div>
+      <input
+        className={`${inputCls} ${errors.subject ? 'border-red-500' : ''}`}
+        value={form.subject} placeholder="Subject"
+        onChange={e=>{ setForm(f=>({...f,subject:e.target.value})); setErrors(er=>({...er,subject:false})); }}
+      />
+      {errors.subject && <p className="text-red-500 text-xs mt-1">Subject is required</p>}
+    </div>
+
+    {/* Client */}
+    <div>
+      <div className={`flex items-center gap-2 border rounded-lg px-3 py-2 ${errors.client ? 'border-red-500' : 'border-gray-200'}`}>
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+        <input
+          className="flex-1 text-sm focus:outline-none bg-transparent"
+          value={form.client} placeholder="Client name"
+          onChange={e=>{ setForm(f=>({...f,client:e.target.value})); setErrors(er=>({...er,client:false})); }}
+        />
+      </div>
+      {errors.client && <p className="text-red-500 text-xs mt-1">Client is required</p>}
+    </div>
+
+    {/* Priority + Assignee */}
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <div className={`flex items-center gap-2 border rounded-lg px-3 py-2 border-gray-200`}>
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" /></svg>
+          <select className="flex-1 text-sm focus:outline-none bg-transparent border-none outline-none" value={form.priority} onChange={e=>setForm(f=>({...f,priority:e.target.value}))}>
+            <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+          </select>
         </div>
-      </Modal>
+      </div>
+      <div>
+        <select
+          className={`${selectCls} ${errors.assignee ? 'border-red-500' : ''}`}
+          value={form.assignee} onChange={e=>{ setForm(f=>({...f,assignee:e.target.value})); setErrors(er=>({...er,assignee:false})); }}
+        >
+          <option value="">Assign to</option>
+          <option>Support Team</option>
+          <option>Finance Manager</option>
+          <option>Admin</option>
+        </select>
+        {errors.assignee && <p className="text-red-500 text-xs mt-1">Assignee is required</p>}
+      </div>
+    </div>
+
+    {/* Description */}
+    <div>
+      <textarea
+        rows={4}
+        className={`${inputCls} resize-none ${errors.description ? 'border-red-500' : ''}`}
+        value={form.description} placeholder="Describe your issue..."
+        onChange={e=>{ setForm(f=>({...f,description:e.target.value})); setErrors(er=>({...er,description:false})); }}
+      />
+      {errors.description && <p className="text-red-500 text-xs mt-1">Description is required</p>}
+    </div>
+
+    {/* Upload Attachment */}
+    <div>
+      <label className={`flex items-center gap-2 border border-dashed border-gray-300 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors`}>
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+        <span className="text-sm text-gray-500">
+          {form.attachment ? form.attachment.name : 'Upload attachment'}
+        </span>
+        <input type="file" className="hidden" onChange={e=>{ const file = e.target.files?.[0]; if(file) setForm(f=>({...f,attachment:file})); }} />
+      </label>
+    </div>
+
+    {/* Actions */}
+    <div className="flex items-center justify-between pt-2">
+      <button onClick={()=>{ setShowCreate(false); setErrors({}); }} className="px-4 py-2 text-gray-600 text-sm hover:underline">Cancel</button>
+      <button onClick={handleCreate} className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Create Ticket</button>
+    </div>
+
+  </div>
+</Modal>
       <Modal open={!!viewTicket} onClose={()=>setViewTicket(null)} title={`Ticket ${viewTicket?.id}`} size="sm">
         {viewTicket && <div className="space-y-3">
           <div><span className="text-gray-500 text-xs uppercase">Subject</span><p className="text-gray-800 font-medium mt-0.5">{viewTicket.subject}</p></div>
