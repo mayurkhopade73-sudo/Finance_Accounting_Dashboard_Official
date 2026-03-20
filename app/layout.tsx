@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <div className="flex h-screen overflow-hidden">
 
-          {/* Sidebar */}
+          {/* Sidebar */} 
           <Sidebar />
 
           {/* Main Area */}
