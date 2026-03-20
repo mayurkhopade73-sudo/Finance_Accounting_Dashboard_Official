@@ -370,7 +370,7 @@
 
 // ai 
 'use client';
-
+ 
 import { useState, useRef, useEffect } from 'react';
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, FileText,
