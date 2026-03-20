@@ -14,7 +14,7 @@ const initBudgets = [
   { id: 'BDG-004', dept: 'HR & Admin', allocated: 25000, spent: 23100, period: 'FY 2025-26' },
   { id: 'BDG-005', dept: 'Sales', allocated: 40000, spent: 38500, period: 'FY 2025-26' },
 ];
-
+    
 type Budget = typeof initBudgets[0];
 
 export default function BudgetsPage() {
