@@ -22,18 +22,27 @@ export default function ContentPage() {
   const [viewItem, setViewItem] = useState<typeof initContent[0]|null>(null);
   const [editItem, setEditItem] = useState<typeof initContent[0]|null>(null);
   const [toast, setToast] = useState('');
-  const [form, setForm] = useState({ title: '', type: 'Guide', status: 'Draft', body: '' });
+  const [form, setForm] = useState({ title: '', type: 'Guide', status: 'Draft', body: '', author: '', category: '', publicationDate: '', tags: [] as string[], tagInput: '' });
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   const filtered = content.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
   const handleCreate = () => {
-    if (!form.title) return;
-    const now = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    setContent(prev => [...prev, { id: `CNT-00${prev.length+1}`, ...form, author: 'Super Admin', date: now, views: 0 }]);
-    setForm({ title: '', type: 'Guide', status: 'Draft', body: '' });
-    setShowCreate(false);
-    setToast('Content created!');
-  };
+  const newErrors: Record<string, boolean> = {};
+  if (!form.title) newErrors.title = true;
+  if (!form.author) newErrors.author = true;
+  if (!form.category) newErrors.category = true;
+  if (!form.status) newErrors.status = true;
+  if (!form.publicationDate) newErrors.publicationDate = true;
+  if (!form.body) newErrors.body = true;
+  if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
+  const now = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  setContent(prev => [...prev, { id: `CNT-00${prev.length+1}`, title: form.title, type: form.type, status: form.status, body: form.body, author: form.author, date: now, views: 0 }]);
+  setForm({ title: '', type: 'Guide', status: 'Draft', body: '', author: '', category: '', publicationDate: '', tags: [], tagInput: '' });
+  setErrors({});
+  setShowCreate(false);
+  setToast('Content created!');
+};
 
   const handleEditSave = () => {
     if (!editItem) return;
@@ -80,20 +89,120 @@ export default function ContentPage() {
         </table>
       </div>
 
-      <Modal open={showCreate} onClose={()=>setShowCreate(false)} title="New Content" size="lg">
-        <div className="space-y-4">
-          <FormField label="Title"><input className={inputCls} value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Content title" /></FormField>
-          <div className="grid grid-cols-2 gap-3">
-            <FormField label="Type"><select className={selectCls} value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))}><option>Guide</option><option>Report</option><option>Checklist</option><option>Template</option></select></FormField>
-            <FormField label="Status"><select className={selectCls} value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))}><option>Draft</option><option>Published</option></select></FormField>
-          </div>
-          <FormField label="Body"><textarea rows={5} className={`${inputCls} resize-none`} value={form.body} onChange={e=>setForm(f=>({...f,body:e.target.value}))} placeholder="Write content here..." /></FormField>
-          <div className="flex gap-3 pt-2">
-            <button onClick={()=>setShowCreate(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
-            <button onClick={handleCreate} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Create</button>
-          </div>
+      <Modal open={showCreate} onClose={()=>{ setShowCreate(false); setErrors({}); }} title="New Content" size="lg">
+  <div className="space-y-4">
+
+    {/* Row 1 - Title + Author */}
+    <div className="grid grid-cols-2 gap-3">
+      <FormField label="Title">
+        <input
+          className={`${inputCls} ${errors.title ? 'border-red-500 focus:border-red-500' : ''}`}
+          value={form.title} onChange={e=>{ setForm(f=>({...f,title:e.target.value})); setErrors(er=>({...er,title:false})); }}
+          placeholder="Content title"
+        />
+        {errors.title && <p className="text-red-500 text-xs mt-1">Title is required</p>}
+      </FormField>
+      <FormField label="Author">
+        <select
+          className={`${selectCls} ${errors.author ? 'border-red-500' : ''}`}
+          value={form.author} onChange={e=>{ setForm(f=>({...f,author:e.target.value})); setErrors(er=>({...er,author:false})); }}
+        >
+          <option value="">Select Author...</option>
+          <option>Anjali Sharma</option>
+          <option>Rohit Kumar</option>
+          <option>Super Admin</option>
+          <option>Finance Manager</option>
+        </select>
+        {errors.author && <p className="text-red-500 text-xs mt-1">Author is required</p>}
+      </FormField>
+    </div>
+
+    {/* Row 2 - Type + Category */}
+    <div className="grid grid-cols-2 gap-3">
+      <FormField label="Type">
+        <select className={selectCls} value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))}>
+          <option>Guide</option><option>Report</option><option>Checklist</option><option>Template</option>
+        </select>
+      </FormField>
+      <FormField label="Category">
+        <select
+          className={`${selectCls} ${errors.category ? 'border-red-500' : ''}`}
+          value={form.category} onChange={e=>{ setForm(f=>({...f,category:e.target.value})); setErrors(er=>({...er,category:false})); }}
+        >
+          <option value="">Select Category...</option>
+          <option>Financial Procedures</option>
+          <option>Accounts Payable</option>
+          <option>Internal Audit</option>
+          <option>Compliance</option>
+          <option>Onboarding</option>
+        </select>
+        {errors.category && <p className="text-red-500 text-xs mt-1">Category is required</p>}
+      </FormField>
+    </div>
+
+    {/* Row 3 - Status + Publication Date */}
+    <div className="grid grid-cols-2 gap-3">
+      <FormField label="Status">
+        <select
+          className={`${selectCls} ${errors.status ? 'border-red-500' : ''}`}
+          value={form.status} onChange={e=>{ setForm(f=>({...f,status:e.target.value})); setErrors(er=>({...er,status:false})); }}
+        >
+          <option>Draft</option><option>Published</option>
+        </select>
+        {errors.status && <p className="text-red-500 text-xs mt-1">Status is required</p>}
+      </FormField>
+      <FormField label="Publication Date">
+        <input
+          type="date"
+          className={`${inputCls} ${errors.publicationDate ? 'border-red-500' : ''}`}
+          value={form.publicationDate} onChange={e=>{ setForm(f=>({...f,publicationDate:e.target.value})); setErrors(er=>({...er,publicationDate:false})); }}
+        />
+        {errors.publicationDate && <p className="text-red-500 text-xs mt-1">Publication date is required</p>}
+      </FormField>
+    </div>
+
+    {/* Body with toolbar */}
+    <FormField label="Body">
+      <div className={`border rounded-lg overflow-hidden ${errors.body ? 'border-red-500' : 'border-gray-200'}`}>
+        <div className="flex gap-1 px-2 py-1.5 bg-gray-50 border-b border-gray-200">
+          {['B','I','U'].map(t=><button key={t} type="button" className={`w-6 h-6 text-xs font-${t==='B'?'bold':t==='I'?'italic':'normal'} text-gray-600 hover:bg-gray-200 rounded`}>{t}</button>)}
+          <div className="w-px bg-gray-300 mx-1" />
+          {['≡','⋮'].map(t=><button key={t} type="button" className="w-6 h-6 text-xs text-gray-600 hover:bg-gray-200 rounded">{t}</button>)}
         </div>
-      </Modal>
+        <textarea
+          rows={4} className="w-full px-3 py-2 text-sm focus:outline-none resize-none"
+          value={form.body} onChange={e=>{ setForm(f=>({...f,body:e.target.value})); setErrors(er=>({...er,body:false})); }}
+          placeholder="Write content here..."
+        />
+      </div>
+      {errors.body && <p className="text-red-500 text-xs mt-1">Body is required</p>}
+    </FormField>
+
+    {/* Tags */}
+    <FormField label="Tags">
+      <div className="flex flex-wrap gap-1.5 px-3 py-2 border border-gray-200 rounded-lg min-h-[40px] bg-white">
+        {form.tags.map(tag=>(
+          <span key={tag} className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+            {tag}
+            <button type="button" onClick={()=>setForm(f=>({...f,tags:f.tags.filter(t=>t!==tag)}))}><X className="w-3 h-3" /></button>
+          </span>
+        ))}
+        <input
+          className="outline-none text-sm flex-1 min-w-[100px]"
+          placeholder="Type and press Enter..."
+          value={form.tagInput}
+          onChange={e=>setForm(f=>({...f,tagInput:e.target.value}))}
+          onKeyDown={e=>{ if(e.key==='Enter' && form.tagInput.trim()){ e.preventDefault(); setForm(f=>({...f,tags:[...f.tags, f.tagInput.trim()],tagInput:''})); }}}
+        />
+      </div>
+    </FormField>
+
+    <div className="flex gap-3 pt-2">
+      <button onClick={()=>{ setShowCreate(false); setErrors({}); }} className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+      <button onClick={handleCreate} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Create</button>
+    </div>
+  </div>
+</Modal>
 
       <Modal open={!!viewItem} onClose={()=>setViewItem(null)} title={viewItem?.title||''} size="lg">
         {viewItem && <div className="space-y-3">
