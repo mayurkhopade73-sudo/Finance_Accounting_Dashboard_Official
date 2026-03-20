@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 
-// Toast component (inline since original imports from Modal)
 function Toast({ message, onDone }) {
   setTimeout(onDone, 2500);
   return (
@@ -12,7 +11,7 @@ function Toast({ message, onDone }) {
   );
 }
 
-// Add Cost Center Modal
+// Add Cost Center Modal — layout matches Add New Asset form
 function AddCostCenterModal({ onClose, onAdd }) {
   const [form, setForm] = useState({ id: '', name: '', head: '', budget: '', actual: '' });
   const [errors, setErrors] = useState({});
@@ -46,49 +45,66 @@ function AddCostCenterModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, type = 'text') => (
+  const field = (key, label, placeholder, required = false) => (
     <div>
-      <label className="block text-gray-400 text-xs font-medium mb-1.5">{label}</label>
+      <label className="block text-gray-600 text-xs font-medium mb-1">
+        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
       <input
-        type={type}
+        type="text"
         placeholder={placeholder}
         value={form[key]}
         onChange={e => { setForm(p => ({ ...p, [key]: e.target.value })); setErrors(p => ({ ...p, [key]: '' })); }}
-        className={`w-full bg-gray-800 border ${errors[key] ? 'border-rose-500' : 'border-gray-700'} rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors`}
+        className={`w-full bg-white border ${errors[key] ? 'border-rose-400' : 'border-gray-300'} rounded-lg px-3 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-colors`}
       />
-      {errors[key] && <p className="text-rose-400 text-xs mt-1">{errors[key]}</p>}
+      {errors[key] && <p className="text-rose-500 text-xs mt-1">{errors[key]}</p>}
     </div>
   );
 
+  const bv = Number(form.budget.replace(/[,$]/g, ''));
+  const av = Number(form.actual.replace(/[,$]/g, ''));
+  const hasVals = form.budget && form.actual && !isNaN(bv) && !isNaN(av);
+  const diff = bv - av;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md mx-4 shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h2 className="text-white font-semibold text-base">Add Cost Center</h2>
-            <p className="text-gray-500 text-xs mt-0.5">Create a new cost center for tracking</p>
+            <h2 className="text-gray-900 font-semibold text-base">Add Cost Center</h2>
+            <p className="text-gray-400 text-xs mt-0.5">Fill in the details to register a new cost center</p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Form */}
         <div className="px-6 py-5 space-y-4">
-          {field('id', 'Cost Center ID', 'e.g. CC-006')}
-          {field('name', 'Department Name', 'e.g. Finance')}
-          {field('head', 'Department Head', 'e.g. Rahul Sharma')}
-          {field('budget', 'Budget (₹/$)', 'e.g. 45000')}
-          {field('actual', 'Actual Spend (₹/$)', 'e.g. 38000')}
+          <div className="grid grid-cols-2 gap-4">
+            {field('id', 'Cost Center ID', 'e.g. CC-006')}
+            {field('name', 'Department Name', 'e.g. Finance', true)}
+          </div>
+          {field('head', 'Department Head', 'e.g. Rahul Sharma', true)}
+         
+          <div className="grid grid-cols-2 gap-4">
+            {field('budget', 'Budget (₹/$)', 'e.g. 45,000', true)}
+            {field('actual', 'Actual Spend (₹/$)', 'e.g. 38,000', true)}
+          </div>
+          <div>
+            <label className="block text-gray-600 text-xs font-medium mb-1">Variance <span className="text-gray-400">(auto)</span></label>
+            <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm select-none">
+              {hasVals
+                ? diff >= 0
+                  ? <span className="text-emerald-600 font-semibold">+${diff.toLocaleString()}</span>
+                  : <span className="text-rose-500 font-semibold">-${Math.abs(diff).toLocaleString()}</span>
+                : <span className="text-gray-400">Will be calculated automatically</span>}
+            </div>
+          </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-700">
-          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+          <button onClick={onClose} className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
             Cancel
           </button>
-          <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
             <Plus className="w-4 h-4" /> Add Cost Center
           </button>
         </div>
@@ -97,7 +113,7 @@ function AddCostCenterModal({ onClose, onAdd }) {
   );
 }
 
-// Add New Job Modal
+// Add New Job Modal — layout matches Add New Asset form
 function AddJobModal({ onClose, onAdd }) {
   const [form, setForm] = useState({ id: '', name: '', client: '', budget: '', actual: '' });
   const [errors, setErrors] = useState({});
@@ -133,78 +149,74 @@ function AddJobModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, colSpan = '') => (
-    <div className={colSpan}>
-      <label className="block text-gray-400 text-xs font-medium mb-1.5">{label}</label>
+  const field = (key, label, placeholder, required = false) => (
+    <div>
+      <label className="block text-gray-600 text-xs font-medium mb-1">
+        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
       <input
         type="text"
         placeholder={placeholder}
         value={form[key]}
         onChange={ev => { setForm(p => ({ ...p, [key]: ev.target.value })); setErrors(p => ({ ...p, [key]: '' })); }}
-        className={`w-full bg-gray-800 border ${errors[key] ? 'border-rose-500' : 'border-gray-700'} rounded-lg px-3 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors`}
+        className={`w-full bg-white border ${errors[key] ? 'border-rose-400' : 'border-gray-300'} rounded-lg px-3 py-2 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-colors`}
       />
-      {errors[key] && <p className="text-rose-400 text-xs mt-1">{errors[key]}</p>}
+      {errors[key] && <p className="text-rose-500 text-xs mt-1">{errors[key]}</p>}
     </div>
   );
 
+  const b = Number(form.budget.replace(/[,$]/g, ''));
+  const a = Number(form.actual.replace(/[,$]/g, ''));
+  const hasVals = form.budget && form.actual && !isNaN(b) && !isNaN(a) && b > 0;
+  const pctPreview = hasVals ? Math.min(Math.round((a / b) * 100), 100) : null;
+  const statusPreview = hasVals ? (a > b ? 'Over Budget' : a === b ? 'Completed' : 'In Progress') : null;
+  const statusColor = statusPreview === 'Over Budget' ? 'text-rose-500' : statusPreview === 'Completed' ? 'text-emerald-600' : 'text-blue-600';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <h2 className="text-white font-semibold text-base">New Job</h2>
-            <p className="text-gray-500 text-xs mt-0.5">Create a new job for cost tracking</p>
+            <h2 className="text-gray-900 font-semibold text-base">New Job</h2>
+            <p className="text-gray-400 text-xs mt-0.5">Fill in the details to create a new job</p>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Form — 2 column grid */}
-        <div className="px-6 py-5 grid grid-cols-2 gap-4">
-          {field('id',     'Job ID',             'e.g. JOB-005')}
-          {field('name',   'Job Name',           'e.g. CRM Setup - Acme')}
-          {field('client', 'Client',             'e.g. Acme Corp')}
-          {field('budget', 'Budget (₹/$)',        'e.g. 50000')}
-          {field('actual', 'Actual Cost (₹/$)',   'e.g. 32000')}
-
-          {/* Auto Completion Preview */}
-          <div>
-            <label className="block text-gray-400 text-xs font-medium mb-1.5">Completion <span className="text-gray-600">(auto)</span></label>
-            <div className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm select-none">
-              {(() => {
-                const b = Number(form.budget.replace(/[,$]/g, ''));
-                const a = Number(form.actual.replace(/[,$]/g, ''));
-                if (!form.budget || !form.actual || isNaN(b) || isNaN(a) || b === 0) return <span className="text-gray-600">Auto</span>;
-                const pct = Math.min(Math.round((a / b) * 100), 100);
-                return <span className="text-blue-400 font-medium">{pct}%</span>;
-              })()}
-            </div>
+        <div className="px-6 py-5 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {field('id', 'Job ID', 'e.g. JOB-005')}
+            {field('name', 'Job Name', 'e.g. CRM Setup - Acme', true)}
           </div>
-
-          {/* Auto Status Preview — full width */}
-          <div className="col-span-2">
-            <label className="block text-gray-400 text-xs font-medium mb-1.5">Status <span className="text-gray-600">(auto-calculated)</span></label>
-            <div className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-500 select-none">
-              {(() => {
-                const b = Number(form.budget.replace(/[,$]/g, ''));
-                const a = Number(form.actual.replace(/[,$]/g, ''));
-                if (!form.budget || !form.actual || isNaN(b) || isNaN(a)) return <span className="text-gray-600">Will be set automatically</span>;
-                if (a > b) return <span className="text-rose-400 font-medium">Over Budget</span>;
-                if (a === b) return <span className="text-emerald-400 font-medium">Completed</span>;
-                return <span className="text-blue-400 font-medium">In Progress</span>;
-              })()}
+          {field('client', 'Client', 'e.g. Acme Corp', true)}
+          <div className="bg-blue-50 rounded-lg px-4 py-2">
+            <p className="text-blue-600 text-xs font-semibold tracking-wide uppercase">Cost Details</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {field('budget', 'Budget (₹/$)', 'e.g. 50,000', true)}
+            {field('actual', 'Actual Cost (₹/$)', 'e.g. 32,000', true)}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-600 text-xs font-medium mb-1">Completion <span className="text-gray-400">(auto)</span></label>
+              <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm select-none">
+                {pctPreview !== null ? <span className="text-blue-600 font-semibold">{pctPreview}%</span> : <span className="text-gray-400">Auto</span>}
+              </div>
+            </div>
+            <div>
+              <label className="block text-gray-600 text-xs font-medium mb-1">Status <span className="text-gray-400">(auto)</span></label>
+              <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm select-none">
+                {statusPreview ? <span className={`font-semibold ${statusColor}`}>{statusPreview}</span> : <span className="text-gray-400">Auto</span>}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-700">
-          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+          <button onClick={onClose} className="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
             Cancel
           </button>
-          <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
             <Plus className="w-4 h-4" /> Add Job
           </button>
         </div>
@@ -276,16 +288,10 @@ export default function CostAccountingPage() {
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       {showJobModal && (
-        <AddJobModal
-          onClose={() => setShowJobModal(false)}
-          onAdd={handleAddJob}
-        />
+        <AddJobModal onClose={() => setShowJobModal(false)} onAdd={handleAddJob} />
       )}
       {showModal && (
-        <AddCostCenterModal
-          onClose={() => setShowModal(false)}
-          onAdd={handleAddCostCenter}
-        />
+        <AddCostCenterModal onClose={() => setShowModal(false)} onAdd={handleAddCostCenter} />
       )}
 
       <div className="flex items-center justify-between">
@@ -293,7 +299,6 @@ export default function CostAccountingPage() {
           <h1 className="text-2xl font-bold text-white-800">Cost Accounting</h1>
           <p className="text-gray-500 text-sm mt-1">Cost centers, job costing, ABC & profitability</p>
         </div>
-       
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -315,14 +320,11 @@ export default function CostAccountingPage() {
 
       {activeTab === 0 && (
         <div className="bg-gray-900 rounded-xl overflow-hidden">
-           <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
             <h2 className="text-white font-semibold text-sm">Job Cost Center</h2>
-            <button
-          onClick={() => setShowModal(true)}
-          className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
-        >
-          + Add Cost Center
-        </button>
+            <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">
+              + Add Cost Center
+            </button>
           </div>
           <table className="w-full">
             <thead><tr className="bg-gray-800 border-b border-gray-700">{['Cost Center ID', 'Name', 'Department Head', 'Budget', 'Actual Spend', 'Variance'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
