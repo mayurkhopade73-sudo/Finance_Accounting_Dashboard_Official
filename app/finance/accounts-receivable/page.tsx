@@ -198,7 +198,7 @@ function validate(form: FormState): FormErrors {
   return errs;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// 
 
 function Err({ msg }: { msg?: string }) {
   return msg ? <p className="text-rose-500 text-xs mt-1">{msg}</p> : null;
@@ -208,7 +208,6 @@ function errBorder(base: string, hasError: boolean) {
   return hasError ? base + ' !border-rose-400' : base;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AccountsReceivablePage() {
   const [receivables, setReceivables] = useState(initReceivables);

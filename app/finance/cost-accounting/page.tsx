@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 
-// Toast component (inline since original imports from Modal)
-function Toast({ message, onDone }) {
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   setTimeout(onDone, 2500);
   return (
     <div className="fixed top-4 right-4 z-50 bg-gray-900 border border-emerald-500/40 text-emerald-400 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-pulse">
@@ -12,13 +11,15 @@ function Toast({ message, onDone }) {
   );
 }
 
-// Add Cost Center Modal
-function AddCostCenterModal({ onClose, onAdd }) {
+type CostCenter = { id: string; name: string; head: string; budget: string; actual: string; variance: string };
+type Job = { id: string; name: string; client: string; budget: string; actual: string; completion: string; status: string };
+
+function AddCostCenterModal({ onClose, onAdd }: { onClose: () => void; onAdd: (c: CostCenter) => void }) {
   const [form, setForm] = useState({ id: '', name: '', head: '', budget: '', actual: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.id.trim()) e.id = 'Cost Center ID is required';
     if (!form.name.trim()) e.name = 'Name is required';
     if (!form.head.trim()) e.head = 'Department Head is required';
@@ -46,11 +47,11 @@ function AddCostCenterModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, type = 'text') => (
-    <div>
+  const field = (key: keyof typeof form, label: string, placeholder: string) => (
+    <div key={key}>
       <label className="block text-gray-400 text-xs font-medium mb-1.5">{label}</label>
       <input
-        type={type}
+        type="text"
         placeholder={placeholder}
         value={form[key]}
         onChange={e => { setForm(p => ({ ...p, [key]: e.target.value })); setErrors(p => ({ ...p, [key]: '' })); }}
@@ -63,7 +64,6 @@ function AddCostCenterModal({ onClose, onAdd }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md mx-4 shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <div>
             <h2 className="text-white font-semibold text-base">Add Cost Center</h2>
@@ -73,8 +73,6 @@ function AddCostCenterModal({ onClose, onAdd }) {
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Form */}
         <div className="px-6 py-5 space-y-4">
           {field('id', 'Cost Center ID', 'e.g. CC-006')}
           {field('name', 'Department Name', 'e.g. Finance')}
@@ -82,12 +80,8 @@ function AddCostCenterModal({ onClose, onAdd }) {
           {field('budget', 'Budget (₹/$)', 'e.g. 45000')}
           {field('actual', 'Actual Spend (₹/$)', 'e.g. 38000')}
         </div>
-
-        {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-700">
-          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">
-            Cancel
-          </button>
+          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">Cancel</button>
           <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
             <Plus className="w-4 h-4" /> Add Cost Center
           </button>
@@ -97,13 +91,12 @@ function AddCostCenterModal({ onClose, onAdd }) {
   );
 }
 
-// Add New Job Modal
-function AddJobModal({ onClose, onAdd }) {
+function AddJobModal({ onClose, onAdd }: { onClose: () => void; onAdd: (j: Job) => void }) {
   const [form, setForm] = useState({ id: '', name: '', client: '', budget: '', actual: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.id.trim()) e.id = 'Job ID is required';
     if (!form.name.trim()) e.name = 'Job Name is required';
     if (!form.client.trim()) e.client = 'Client is required';
@@ -133,8 +126,8 @@ function AddJobModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, colSpan = '') => (
-    <div className={colSpan}>
+  const field = (key: keyof typeof form, label: string, placeholder: string) => (
+    <div key={key}>
       <label className="block text-gray-400 text-xs font-medium mb-1.5">{label}</label>
       <input
         type="text"
@@ -147,10 +140,14 @@ function AddJobModal({ onClose, onAdd }) {
     </div>
   );
 
+  const b = Number(form.budget.replace(/[,$]/g, ''));
+  const a = Number(form.actual.replace(/[,$]/g, ''));
+  const pctPreview = form.budget && form.actual && !isNaN(b) && !isNaN(a) && b > 0 ? Math.min(Math.round((a / b) * 100), 100) : null;
+  const statusPreview = pctPreview !== null ? (a > b ? 'Over Budget' : a === b ? 'Completed' : 'In Progress') : null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <div>
             <h2 className="text-white font-semibold text-base">New Job</h2>
@@ -160,50 +157,30 @@ function AddJobModal({ onClose, onAdd }) {
             <X className="w-4 h-4" />
           </button>
         </div>
-
-        {/* Form — 2 column grid */}
         <div className="px-6 py-5 grid grid-cols-2 gap-4">
-          {field('id',     'Job ID',             'e.g. JOB-005')}
-          {field('name',   'Job Name',           'e.g. CRM Setup - Acme')}
-          {field('client', 'Client',             'e.g. Acme Corp')}
-          {field('budget', 'Budget (₹/$)',        'e.g. 50000')}
-          {field('actual', 'Actual Cost (₹/$)',   'e.g. 32000')}
-
-          {/* Auto Completion Preview */}
+          {field('id', 'Job ID', 'e.g. JOB-005')}
+          {field('name', 'Job Name', 'e.g. CRM Setup - Acme')}
+          {field('client', 'Client', 'e.g. Acme Corp')}
+          {field('budget', 'Budget (₹/$)', 'e.g. 50000')}
+          {field('actual', 'Actual Cost (₹/$)', 'e.g. 32000')}
           <div>
             <label className="block text-gray-400 text-xs font-medium mb-1.5">Completion <span className="text-gray-600">(auto)</span></label>
             <div className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm select-none">
-              {(() => {
-                const b = Number(form.budget.replace(/[,$]/g, ''));
-                const a = Number(form.actual.replace(/[,$]/g, ''));
-                if (!form.budget || !form.actual || isNaN(b) || isNaN(a) || b === 0) return <span className="text-gray-600">Auto</span>;
-                const pct = Math.min(Math.round((a / b) * 100), 100);
-                return <span className="text-blue-400 font-medium">{pct}%</span>;
-              })()}
+              {pctPreview !== null ? <span className="text-blue-400 font-medium">{pctPreview}%</span> : <span className="text-gray-600">Auto</span>}
             </div>
           </div>
-
-          {/* Auto Status Preview — full width */}
           <div className="col-span-2">
             <label className="block text-gray-400 text-xs font-medium mb-1.5">Status <span className="text-gray-600">(auto-calculated)</span></label>
-            <div className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-500 select-none">
-              {(() => {
-                const b = Number(form.budget.replace(/[,$]/g, ''));
-                const a = Number(form.actual.replace(/[,$]/g, ''));
-                if (!form.budget || !form.actual || isNaN(b) || isNaN(a)) return <span className="text-gray-600">Will be set automatically</span>;
-                if (a > b) return <span className="text-rose-400 font-medium">Over Budget</span>;
-                if (a === b) return <span className="text-emerald-400 font-medium">Completed</span>;
-                return <span className="text-blue-400 font-medium">In Progress</span>;
-              })()}
+            <div className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm select-none">
+              {statusPreview === 'Over Budget' && <span className="text-rose-400 font-medium">Over Budget</span>}
+              {statusPreview === 'Completed' && <span className="text-emerald-400 font-medium">Completed</span>}
+              {statusPreview === 'In Progress' && <span className="text-blue-400 font-medium">In Progress</span>}
+              {!statusPreview && <span className="text-gray-600">Will be set automatically</span>}
             </div>
           </div>
         </div>
-
-        {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-700">
-          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">
-            Cancel
-          </button>
+          <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors rounded-lg hover:bg-gray-800">Cancel</button>
           <button onClick={handleSubmit} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
             <Plus className="w-4 h-4" /> Add Job
           </button>
@@ -215,7 +192,7 @@ function AddJobModal({ onClose, onAdd }) {
 
 const tabs = ['Cost Centers', 'Job Costing', 'ABC Costing', 'Cost Allocation', 'Profitability'];
 
-const initialCostCenters = [
+const initialCostCenters: CostCenter[] = [
   { id: 'CC-001', name: 'Engineering', head: 'Raj Kumar', budget: '$80,000', actual: '$72,400', variance: '+$7,600' },
   { id: 'CC-002', name: 'Marketing', head: 'Priya Shah', budget: '$30,000', actual: '$28,200', variance: '+$1,800' },
   { id: 'CC-003', name: 'Operations', head: 'Anil Mehta', budget: '$50,000', actual: '$51,200', variance: '-$1,200' },
@@ -223,7 +200,7 @@ const initialCostCenters = [
   { id: 'CC-005', name: 'Sales', head: 'Deepak Gupta', budget: '$40,000', actual: '$38,500', variance: '+$1,500' },
 ];
 
-const jobs = [
+const initialJobs: Job[] = [
   { id: 'JOB-001', name: 'ERP Implementation - Pinnacle', client: 'Pinnacle Corp', budget: '$1,20,000', actual: '$98,400', completion: '82%', status: 'In Progress' },
   { id: 'JOB-002', name: 'Finance Module - Horizon', client: 'Horizon Finance', budget: '$40,000', actual: '$40,000', completion: '100%', status: 'Completed' },
   { id: 'JOB-003', name: 'Analytics Setup - BlueSky', client: 'BlueSky Analytics', budget: '$15,000', actual: '$8,200', completion: '55%', status: 'In Progress' },
@@ -259,15 +236,15 @@ export default function CostAccountingPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showJobModal, setShowJobModal] = useState(false);
-  const [costCenters, setCostCenters] = useState(initialCostCenters);
-  const [jobList, setJobList] = useState(jobs);
+  const [costCenters, setCostCenters] = useState<CostCenter[]>(initialCostCenters);
+  const [jobList, setJobList] = useState<Job[]>(initialJobs);
 
-  const handleAddCostCenter = (newCenter) => {
+  const handleAddCostCenter = (newCenter: CostCenter) => {
     setCostCenters(prev => [...prev, newCenter]);
     setToast('Cost center added successfully!');
   };
 
-  const handleAddJob = (newJob) => {
+  const handleAddJob = (newJob: Job) => {
     setJobList(prev => [...prev, newJob]);
     setToast('New job added successfully!');
   };
@@ -275,25 +252,14 @@ export default function CostAccountingPage() {
   return (
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
-      {showJobModal && (
-        <AddJobModal
-          onClose={() => setShowJobModal(false)}
-          onAdd={handleAddJob}
-        />
-      )}
-      {showModal && (
-        <AddCostCenterModal
-          onClose={() => setShowModal(false)}
-          onAdd={handleAddCostCenter}
-        />
-      )}
+      {showJobModal && <AddJobModal onClose={() => setShowJobModal(false)} onAdd={handleAddJob} />}
+      {showModal && <AddCostCenterModal onClose={() => setShowModal(false)} onAdd={handleAddCostCenter} />}
 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white-800">Cost Accounting</h1>
           <p className="text-gray-500 text-sm mt-1">Cost centers, job costing, ABC & profitability</p>
         </div>
-       
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -310,22 +276,29 @@ export default function CostAccountingPage() {
       </div>
 
       <div className="border-b border-gray-200">
-        <div className="flex">{tabs.map((tab, i) => <button key={tab} onClick={() => setActiveTab(i)} className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${activeTab === i ? 'text-blue-600 font-medium border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>{tab}</button>)}</div>
+        <div className="flex">
+          {tabs.map((tab, i) => (
+            <button key={tab} onClick={() => setActiveTab(i)} className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${activeTab === i ? 'text-blue-600 font-medium border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === 0 && (
         <div className="bg-gray-900 rounded-xl overflow-hidden">
-           <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
             <h2 className="text-white font-semibold text-sm">Job Cost Center</h2>
-            <button
-          onClick={() => setShowModal(true)}
-          className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
-        >
-          + Add Cost Center
-        </button>
+            <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">+ Add Cost Center</button>
           </div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Cost Center ID', 'Name', 'Department Head', 'Budget', 'Actual Spend', 'Variance'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Cost Center ID', 'Name', 'Department Head', 'Budget', 'Actual Spend', 'Variance'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {costCenters.map(c => (
                 <tr key={c.id} className="hover:bg-gray-800/60">
@@ -349,7 +322,13 @@ export default function CostAccountingPage() {
             <button onClick={() => setShowJobModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">+ New Job</button>
           </div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Job ID', 'Job Name', 'Client', 'Budget', 'Actual Cost', 'Completion', 'Status'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Job ID', 'Job Name', 'Client', 'Budget', 'Actual Cost', 'Completion', 'Status'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {jobList.map(j => (
                 <tr key={j.id} className="hover:bg-gray-800/60">
@@ -380,7 +359,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Activity-Based Costing</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Activity', 'Cost Driver', 'Driver Qty', 'Cost per Driver', 'Total Cost'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Activity', 'Cost Driver', 'Driver Qty', 'Cost per Driver', 'Total Cost'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {abcActivities.map((a, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
@@ -400,7 +385,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Cost Allocation Matrix</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['From (Cost Pool)', 'To (Cost Center)', 'Allocation Method', 'Amount', 'Basis %'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['From (Cost Pool)', 'To (Cost Center)', 'Allocation Method', 'Amount', 'Basis %'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {allocations.map((a, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
@@ -420,7 +411,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Profitability by Segment</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Segment', 'Revenue', 'COGS', 'Gross Profit', 'Gross Margin'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Segment', 'Revenue', 'COGS', 'Gross Profit', 'Gross Margin'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {profitability.map((p, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
