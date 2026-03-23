@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 
-function Toast({ message, onDone }) {
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   setTimeout(onDone, 2500);
   return (
     <div className="fixed top-4 right-4 z-50 bg-gray-900 border border-emerald-500/40 text-emerald-400 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-pulse">
@@ -11,13 +11,15 @@ function Toast({ message, onDone }) {
   );
 }
 
-// Add Cost Center Modal — layout matches Add New Asset form
-function AddCostCenterModal({ onClose, onAdd }) {
+type CostCenter = { id: string; name: string; head: string; budget: string; actual: string; variance: string };
+type Job = { id: string; name: string; client: string; budget: string; actual: string; completion: string; status: string };
+
+function AddCostCenterModal({ onClose, onAdd }: { onClose: () => void; onAdd: (c: CostCenter) => void }) {
   const [form, setForm] = useState({ id: '', name: '', head: '', budget: '', actual: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.id.trim()) e.id = 'Cost Center ID is required';
     if (!form.name.trim()) e.name = 'Name is required';
     if (!form.head.trim()) e.head = 'Department Head is required';
@@ -45,8 +47,8 @@ function AddCostCenterModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, required = false) => (
-    <div>
+  const field = (key: keyof typeof form, label: string, placeholder: string, required = false) => (
+    <div key={key}>
       <label className="block text-gray-600 text-xs font-medium mb-1">
         {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
@@ -84,7 +86,6 @@ function AddCostCenterModal({ onClose, onAdd }) {
             {field('name', 'Department Name', 'e.g. Finance', true)}
           </div>
           {field('head', 'Department Head', 'e.g. Rahul Sharma', true)}
-         
           <div className="grid grid-cols-2 gap-4">
             {field('budget', 'Budget (₹/$)', 'e.g. 45,000', true)}
             {field('actual', 'Actual Spend (₹/$)', 'e.g. 38,000', true)}
@@ -113,13 +114,12 @@ function AddCostCenterModal({ onClose, onAdd }) {
   );
 }
 
-// Add New Job Modal — layout matches Add New Asset form
-function AddJobModal({ onClose, onAdd }) {
+function AddJobModal({ onClose, onAdd }: { onClose: () => void; onAdd: (j: Job) => void }) {
   const [form, setForm] = useState({ id: '', name: '', client: '', budget: '', actual: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.id.trim()) e.id = 'Job ID is required';
     if (!form.name.trim()) e.name = 'Job Name is required';
     if (!form.client.trim()) e.client = 'Client is required';
@@ -149,8 +149,8 @@ function AddJobModal({ onClose, onAdd }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, required = false) => (
-    <div>
+  const field = (key: keyof typeof form, label: string, placeholder: string, required = false) => (
+    <div key={key}>
       <label className="block text-gray-600 text-xs font-medium mb-1">
         {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
@@ -227,7 +227,7 @@ function AddJobModal({ onClose, onAdd }) {
 
 const tabs = ['Cost Centers', 'Job Costing', 'ABC Costing', 'Cost Allocation', 'Profitability'];
 
-const initialCostCenters = [
+const initialCostCenters: CostCenter[] = [
   { id: 'CC-001', name: 'Engineering', head: 'Raj Kumar', budget: '$80,000', actual: '$72,400', variance: '+$7,600' },
   { id: 'CC-002', name: 'Marketing', head: 'Priya Shah', budget: '$30,000', actual: '$28,200', variance: '+$1,800' },
   { id: 'CC-003', name: 'Operations', head: 'Anil Mehta', budget: '$50,000', actual: '$51,200', variance: '-$1,200' },
@@ -235,7 +235,7 @@ const initialCostCenters = [
   { id: 'CC-005', name: 'Sales', head: 'Deepak Gupta', budget: '$40,000', actual: '$38,500', variance: '+$1,500' },
 ];
 
-const jobs = [
+const initialJobs: Job[] = [
   { id: 'JOB-001', name: 'ERP Implementation - Pinnacle', client: 'Pinnacle Corp', budget: '$1,20,000', actual: '$98,400', completion: '82%', status: 'In Progress' },
   { id: 'JOB-002', name: 'Finance Module - Horizon', client: 'Horizon Finance', budget: '$40,000', actual: '$40,000', completion: '100%', status: 'Completed' },
   { id: 'JOB-003', name: 'Analytics Setup - BlueSky', client: 'BlueSky Analytics', budget: '$15,000', actual: '$8,200', completion: '55%', status: 'In Progress' },
@@ -271,15 +271,15 @@ export default function CostAccountingPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showJobModal, setShowJobModal] = useState(false);
-  const [costCenters, setCostCenters] = useState(initialCostCenters);
-  const [jobList, setJobList] = useState(jobs);
+  const [costCenters, setCostCenters] = useState<CostCenter[]>(initialCostCenters);
+  const [jobList, setJobList] = useState<Job[]>(initialJobs);
 
-  const handleAddCostCenter = (newCenter) => {
+  const handleAddCostCenter = (newCenter: CostCenter) => {
     setCostCenters(prev => [...prev, newCenter]);
     setToast('Cost center added successfully!');
   };
 
-  const handleAddJob = (newJob) => {
+  const handleAddJob = (newJob: Job) => {
     setJobList(prev => [...prev, newJob]);
     setToast('New job added successfully!');
   };
@@ -287,12 +287,8 @@ export default function CostAccountingPage() {
   return (
     <div className="p-6 space-y-6">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
-      {showJobModal && (
-        <AddJobModal onClose={() => setShowJobModal(false)} onAdd={handleAddJob} />
-      )}
-      {showModal && (
-        <AddCostCenterModal onClose={() => setShowModal(false)} onAdd={handleAddCostCenter} />
-      )}
+      {showJobModal && <AddJobModal onClose={() => setShowJobModal(false)} onAdd={handleAddJob} />}
+      {showModal && <AddCostCenterModal onClose={() => setShowModal(false)} onAdd={handleAddCostCenter} />}
 
       <div className="flex items-center justify-between">
         <div>
@@ -315,19 +311,29 @@ export default function CostAccountingPage() {
       </div>
 
       <div className="border-b border-gray-200">
-        <div className="flex">{tabs.map((tab, i) => <button key={tab} onClick={() => setActiveTab(i)} className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${activeTab === i ? 'text-blue-600 font-medium border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>{tab}</button>)}</div>
+        <div className="flex">
+          {tabs.map((tab, i) => (
+            <button key={tab} onClick={() => setActiveTab(i)} className={`px-4 py-2.5 text-sm border-b-2 transition-colors ${activeTab === i ? 'text-blue-600 font-medium border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700'}`}>
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeTab === 0 && (
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
             <h2 className="text-white font-semibold text-sm">Job Cost Center</h2>
-            <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">
-              + Add Cost Center
-            </button>
+            <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">+ Add Cost Center</button>
           </div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Cost Center ID', 'Name', 'Department Head', 'Budget', 'Actual Spend', 'Variance'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Cost Center ID', 'Name', 'Department Head', 'Budget', 'Actual Spend', 'Variance'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {costCenters.map(c => (
                 <tr key={c.id} className="hover:bg-gray-800/60">
@@ -351,7 +357,13 @@ export default function CostAccountingPage() {
             <button onClick={() => setShowJobModal(true)} className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">+ New Job</button>
           </div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Job ID', 'Job Name', 'Client', 'Budget', 'Actual Cost', 'Completion', 'Status'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Job ID', 'Job Name', 'Client', 'Budget', 'Actual Cost', 'Completion', 'Status'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {jobList.map(j => (
                 <tr key={j.id} className="hover:bg-gray-800/60">
@@ -382,7 +394,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Activity-Based Costing</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Activity', 'Cost Driver', 'Driver Qty', 'Cost per Driver', 'Total Cost'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Activity', 'Cost Driver', 'Driver Qty', 'Cost per Driver', 'Total Cost'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {abcActivities.map((a, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
@@ -402,7 +420,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Cost Allocation Matrix</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['From (Cost Pool)', 'To (Cost Center)', 'Allocation Method', 'Amount', 'Basis %'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['From (Cost Pool)', 'To (Cost Center)', 'Allocation Method', 'Amount', 'Basis %'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {allocations.map((a, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
@@ -422,7 +446,13 @@ export default function CostAccountingPage() {
         <div className="bg-gray-900 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-700"><h2 className="text-white font-semibold text-sm">Profitability by Segment</h2></div>
           <table className="w-full">
-            <thead><tr className="bg-gray-800 border-b border-gray-700">{['Segment', 'Revenue', 'COGS', 'Gross Profit', 'Gross Margin'].map(h => <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>)}</tr></thead>
+            <thead>
+              <tr className="bg-gray-800 border-b border-gray-700">
+                {['Segment', 'Revenue', 'COGS', 'Gross Profit', 'Gross Margin'].map(h => (
+                  <th key={h} className="text-left text-gray-400 text-xs font-medium px-4 py-3">{h}</th>
+                ))}
+              </tr>
+            </thead>
             <tbody className="divide-y divide-gray-800">
               {profitability.map((p, i) => (
                 <tr key={i} className="hover:bg-gray-800/60">
