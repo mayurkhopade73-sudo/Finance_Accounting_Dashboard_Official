@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           {/* Sidebar */} 
           <Sidebar />
-
+ 
           {/* Main Area */}
           <div className="flex-1 flex flex-col overflow-hidden">
 
