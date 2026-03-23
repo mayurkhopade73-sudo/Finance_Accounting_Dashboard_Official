@@ -10,6 +10,8 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+
+
 export function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
   if (!open) return null;
   const widths = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' };
