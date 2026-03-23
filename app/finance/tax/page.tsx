@@ -1,10 +1,30 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, X, Plus } from 'lucide-react';
-import jsPDF from 'jspdf';
 
-// Inline Toast
-function Toast({ message, onDone }) {
+// ─── Load jsPDF via script tag (Next.js safe) ─────────────────────────────────
+function useJsPDF() {
+  useEffect(() => {
+    if ((window as any).jspdf) return;
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Filing = {
+  id: string;
+  type: string;
+  period: string;
+  dueDate: string;
+  amount: string;
+  status: string;
+};
+
+// ─── Inline Toast ─────────────────────────────────────────────────────────────
+function Toast({ message, onDone }: { message: string; onDone: () => void }) {
   setTimeout(onDone, 2500);
   return (
     <div className="fixed top-4 right-4 z-50 bg-gray-900 border border-emerald-500/40 text-emerald-400 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-pulse">
@@ -13,13 +33,13 @@ function Toast({ message, onDone }) {
   );
 }
 
-// Add Client Modal — layout matches Add New Asset / Add Cost Center form
-function AddClientModal({ onClose, onAdd, nextId }) {
+// ─── Add Filing Modal ─────────────────────────────────────────────────────────
+function AddClientModal({ onClose, onAdd, nextId }: { onClose: () => void; onAdd: (f: Filing) => void; nextId: string }) {
   const [form, setForm] = useState({ type: '', period: '', dueDate: '', amount: '' });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
-    const e = {};
+    const e: Record<string, string> = {};
     if (!form.type.trim()) e.type = 'Tax Type is required';
     if (!form.period.trim()) e.period = 'Period is required';
     if (!form.dueDate.trim()) e.dueDate = 'Due Date is required';
@@ -28,7 +48,7 @@ function AddClientModal({ onClose, onAdd, nextId }) {
     return e;
   };
 
-  const getAutoStatus = (dueDateStr) => {
+  const getAutoStatus = (dueDateStr: string) => {
     if (!dueDateStr) return null;
     const due = new Date(dueDateStr);
     const today = new Date();
@@ -46,7 +66,7 @@ function AddClientModal({ onClose, onAdd, nextId }) {
     onClose();
   };
 
-  const field = (key, label, placeholder, required = false, type = 'text') => (
+  const field = (key: keyof typeof form, label: string, placeholder: string, required = false, type = 'text') => (
     <div>
       <label className="block text-gray-600 text-xs font-medium mb-1">
         {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
@@ -107,8 +127,6 @@ function AddClientModal({ onClose, onAdd, nextId }) {
             {field('dueDate', 'Due Date', '', true, 'date')}
           </div>
 
- 
-
           <div className="grid grid-cols-2 gap-4">
             {field('amount', 'Amount (₹/$)', 'e.g. 15,000', true)}
             <div>
@@ -118,7 +136,7 @@ function AddClientModal({ onClose, onAdd, nextId }) {
                   ? <span className={`font-semibold ${statusColor}`}>{statusPreview}</span>
                   : <span className="text-gray-400">Set after due date</span>}
               </div>
-            </div> 
+            </div>
           </div>
         </div>
 
@@ -136,8 +154,8 @@ function AddClientModal({ onClose, onAdd, nextId }) {
   );
 }
 
-// Inline confirm modal
-function ConfirmModal({ filing, onClose, onConfirm }) {
+// ─── Confirm Modal ────────────────────────────────────────────────────────────
+function ConfirmModal({ filing, onClose, onConfirm }: { filing: Filing | null; onClose: () => void; onConfirm: () => void }) {
   if (!filing) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -158,13 +176,15 @@ function ConfirmModal({ filing, onClose, onConfirm }) {
   );
 }
 
-const statusStyle = {
+// ─── Status styles ────────────────────────────────────────────────────────────
+const statusStyle: Record<string, string> = {
   Filed: 'bg-emerald-500/20 text-emerald-400',
   Upcoming: 'bg-amber-500/20 text-amber-400',
   Overdue: 'bg-rose-500/20 text-rose-400',
 };
 
-const initFilings = [
+// ─── Initial Data ─────────────────────────────────────────────────────────────
+const initFilings: Filing[] = [
   { id: 'TAX-001', type: 'GST Monthly Return (GSTR-3B)', period: 'Feb 2026', dueDate: 'Mar 20, 2026', amount: '$18,400', status: 'Filed' },
   { id: 'TAX-002', type: 'TDS Return (Form 26Q)', period: 'Q3 FY26', dueDate: 'Mar 31, 2026', amount: '$9,200', status: 'Upcoming' },
   { id: 'TAX-003', type: 'GST Monthly Return (GSTR-3B)', period: 'Mar 2026', dueDate: 'Apr 20, 2026', amount: '$21,000', status: 'Upcoming' },
@@ -172,11 +192,15 @@ const initFilings = [
   { id: 'TAX-005', type: 'Annual Income Tax Return', period: 'FY 2024-25', dueDate: 'Jul 31, 2025', amount: '$1,20,000', status: 'Filed' },
 ];
 
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function TaxPage() {
-  const [filings, setFilings] = useState(initFilings);
-  const [fileNow, setFileNow] = useState(null);
+  const [filings, setFilings] = useState<Filing[]>(initFilings);
+  const [fileNow, setFileNow] = useState<Filing | null>(null);
   const [toast, setToast] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Load jsPDF via script tag — no import needed
+  useJsPDF();
 
   const nextId = `TAX-${String(filings.length + 1).padStart(3, '0')}`;
 
@@ -187,7 +211,13 @@ export default function TaxPage() {
     setFileNow(null);
   };
 
-  const handleDownload = (filing) => {
+  const handleDownload = (filing: Filing) => {
+    const win = window as any;
+    if (!win.jspdf?.jsPDF) {
+      setToast('PDF library loading, please try again.');
+      return;
+    }
+    const { jsPDF } = win.jspdf;
     const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const doc = new jsPDF();
     const pageW = doc.internal.pageSize.getWidth();
@@ -226,7 +256,7 @@ export default function TaxPage() {
     doc.setDrawColor(229, 231, 235);
     doc.roundedRect(14, 58, pageW - 28, 90, 4, 4, 'S');
 
-    const rows = [
+    const rows: [string, string][] = [
       ['Filing ID', filing.id],
       ['Tax Type', filing.type],
       ['Period', filing.period],
@@ -246,7 +276,10 @@ export default function TaxPage() {
       else if (label === 'Status') { doc.setTextColor(22, 163, 74); }
       else { doc.setTextColor(17, 24, 39); doc.setFontSize(10); }
       doc.text(value, pageW - 22, y, { align: 'right' });
-      if (i < rows.length - 1) { doc.setDrawColor(229, 231, 235); doc.line(22, y + 4, pageW - 22, y + 4); }
+      if (i < rows.length - 1) {
+        doc.setDrawColor(229, 231, 235);
+        doc.line(22, y + 4, pageW - 22, y + 4);
+      }
     });
 
     // Footer
@@ -259,13 +292,17 @@ export default function TaxPage() {
     setToast('Receipt downloaded!');
   };
 
-  const handleAddFiling = (newFiling) => {
+  const handleAddFiling = (newFiling: Filing) => {
     setFilings(prev => [...prev, newFiling]);
     setToast('Tax filing added successfully!');
   };
 
-  const totalPaid = filings.filter(f => f.status === 'Filed').reduce((s, f) => s + parseFloat(f.amount.replace(/[$,]/g, '')), 0);
-  const totalPending = filings.filter(f => f.status === 'Upcoming').reduce((s, f) => s + parseFloat(f.amount.replace(/[$,]/g, '')), 0);
+  const totalPaid = filings
+    .filter(f => f.status === 'Filed')
+    .reduce((s, f) => s + parseFloat(f.amount.replace(/[$,]/g, '')), 0);
+  const totalPending = filings
+    .filter(f => f.status === 'Upcoming')
+    .reduce((s, f) => s + parseFloat(f.amount.replace(/[$,]/g, '')), 0);
 
   return (
     <div className="p-6 space-y-6">
@@ -320,9 +357,17 @@ export default function TaxPage() {
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusStyle[f.status]}`}>{f.status}</span>
                 </td>
                 <td className="px-4 py-3.5 flex gap-1.5">
-                  {f.status === 'Upcoming' && <button onClick={() => setFileNow(f)} className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">File Now</button>}
-                  {f.status === 'Overdue' && <button onClick={() => setFileNow(f)} className="px-3 py-1 bg-rose-600 text-white rounded text-xs hover:bg-rose-700">File Now</button>}
-                  {f.status === 'Filed' && <button onClick={() => handleDownload(f)} className="flex items-center gap-1 px-3 py-1 bg-gray-700 text-gray-300 rounded text-xs hover:bg-gray-600"><Download className="w-3 h-3" /> Receipt</button>}
+                  {f.status === 'Upcoming' && (
+                    <button onClick={() => setFileNow(f)} className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">File Now</button>
+                  )}
+                  {f.status === 'Overdue' && (
+                    <button onClick={() => setFileNow(f)} className="px-3 py-1 bg-rose-600 text-white rounded text-xs hover:bg-rose-700">File Now</button>
+                  )}
+                  {f.status === 'Filed' && (
+                    <button onClick={() => handleDownload(f)} className="flex items-center gap-1 px-3 py-1 bg-gray-700 text-gray-300 rounded text-xs hover:bg-gray-600">
+                      <Download className="w-3 h-3" /> Receipt
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
