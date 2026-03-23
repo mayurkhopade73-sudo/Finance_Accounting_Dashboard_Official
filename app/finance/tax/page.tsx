@@ -27,7 +27,7 @@ function AddClientModal({ onClose, onAdd, nextId }) {
     else if (isNaN(Number(form.amount.replace(/[$,]/g, '')))) e.amount = 'Enter a valid number';
     return e;
   };
-
+ 
   const getAutoStatus = (dueDateStr) => {
     if (!dueDateStr) return null;
     const due = new Date(dueDateStr);
