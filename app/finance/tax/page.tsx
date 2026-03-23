@@ -118,7 +118,7 @@ function AddClientModal({ onClose, onAdd, nextId }) {
                   ? <span className={`font-semibold ${statusColor}`}>{statusPreview}</span>
                   : <span className="text-gray-400">Set after due date</span>}
               </div>
-            </div>
+            </div> 
           </div>
         </div>
 
