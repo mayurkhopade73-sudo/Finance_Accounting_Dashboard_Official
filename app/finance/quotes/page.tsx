@@ -13,7 +13,7 @@ const statusStyle: Record<string,string> = {
   Sent:'bg-blue-50 text-blue-700 border border-blue-200', Draft:'bg-gray-100 text-gray-600',
   Accepted:'bg-emerald-50 text-emerald-700 border border-emerald-200', Expired:'bg-red-50 text-red-700 border border-red-200',
 };
-
+     
 export default function QuotesPage() {
   const [quotes, setQuotes] = useState(initQuotes);
   const [showCreate, setShowCreate] = useState(false);
