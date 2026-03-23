@@ -60,7 +60,7 @@ export default function Header() {
             SOC 2 Type II
           </span>
         </div>
-      </div>
+      </div>   
 
       {/* RIGHT */}
       <div className="hidden md:flex items-center gap-3">
@@ -181,3 +181,5 @@ export default function Header() {
     </header>
   )
 }
+
+
